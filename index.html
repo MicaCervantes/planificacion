@@ -72,7 +72,8 @@ async function submitResponse(){
   if(!FLOW_URL){msg.textContent='Falta configurar FLOW_URL en el archivo (ver README).';return;}
   const btn=document.getElementById('submitBtn');btn.disabled=true;msg.textContent='Enviando…';
   const rid='r-'+Math.random().toString(36).slice(2,10)+Date.now().toString(36);
-  const payload={respondentId:rid,comment,ratings,submittedAt:new Date().toISOString()};
+  const safeComment = /^[=+\-@]/.test(comment) ? ' ' + comment : comment;
+  const payload={respondentId:rid,comment:safeComment,ratings,submittedAt:new Date().toISOString()};
   try{
     await fetch(FLOW_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     document.getElementById('formCard').style.display='none';
