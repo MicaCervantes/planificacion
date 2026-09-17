@@ -40,8 +40,6 @@ textarea{min-height:80px;resize:vertical}
   <div class="card" id="formCard">
     <h2>¿Cómo calificarías el rendimiento de cada persona?</h2>
     <p class="sub">Del 1 (Bajo) al 5 (Alto). Califica <b>solo a las personas con las que has trabajado</b>. Deja "No trabajé con esta persona" en el resto — esos no se cuentan en su promedio.</p>
-    <label class="fld" for="rname">Tu nombre <span class="note">(opcional)</span></label>
-    <input type="text" id="rname" placeholder="Escribe tu nombre">
     <div id="people"></div>
     <label class="fld" for="rcomment" style="margin-top:18px">¿Algún comentario o sugerencia para el área? <span class="note">(obligatorio)</span></label>
     <textarea id="rcomment" placeholder="Escribe tu respuesta"></textarea>
@@ -56,7 +54,6 @@ const FLOW_URL = "https://default4fc2f3aa31c44dcbb719c6c16393e9.d3.environment.a
 const PLAN=["Rhonald Lavado","Renzo Gordillo","Daniel Baquedano","Iván Bustos","Andre Uribe","Jonathan Zevallos"];
 const AUD=["Yohanna Huari","Lelia Ortiz","Edwin Velazquez","Aranzazu Sokolich","Allison Quinteros","Marlon Pezo","Lucero Vilchez","Patricia Reto","Jhonatan Cochachi","Andre Sanchez","Bryan Granados"];
 const ALL=[...PLAN,...AUD];
-let myId=localStorage.getItem('cu_rid');if(!myId){myId='r-'+Math.random().toString(36).slice(2,10)+Date.now().toString(36);try{localStorage.setItem('cu_rid',myId);}catch(e){}}
 function esc(s){return (s||"").replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));}
 function buildPeople(){const host=document.getElementById('people');
   function group(t,list){let h='<div class="grouptitle">'+t+' <span class="ln"></span></div>';
@@ -69,13 +66,13 @@ function getRatings(){const out={};ALL.forEach(n=>{const i=ALL.indexOf(n);const 
 async function submitResponse(){
   const msg=document.getElementById('submitMsg');
   const ratings=getRatings();
-  const name=document.getElementById('rname').value.trim();
   const comment=document.getElementById('rcomment').value.trim();
   if(!comment){msg.textContent='El comentario es obligatorio. Escríbelo antes de enviar.';document.getElementById('rcomment').focus();return;}
   if(Object.keys(ratings).length===0){msg.textContent='Califica al menos a una persona antes de enviar.';return;}
   if(!FLOW_URL){msg.textContent='Falta configurar FLOW_URL en el archivo (ver README).';return;}
   const btn=document.getElementById('submitBtn');btn.disabled=true;msg.textContent='Enviando…';
-  const payload={respondentId:myId,name,comment,ratings,submittedAt:new Date().toISOString()};
+  const rid='r-'+Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+  const payload={respondentId:rid,comment,ratings,submittedAt:new Date().toISOString()};
   try{
     await fetch(FLOW_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     document.getElementById('formCard').style.display='none';
